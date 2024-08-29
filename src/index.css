@@ -16,3 +16,35 @@ body {
 body::-webkit-scrollbar {
   width: 0px;
 }
+
+.transition-all-300 {
+  transition: all 0.3s ease;
+}
+
+.scale-active:active {
+  transform: scale(0.98);
+}
+
+.buttons {
+  transform: translateY(-50%);
+}
+
+.iconsImported {
+  border-radius: 50%;
+  box-shadow: 1px 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.fontImported {
+  font-family: inherit;
+}
+
+.degrade {
+  background-clip: text;
+  background: linear-gradient(91deg, #f56693 0, #6fcf97 90.46%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
