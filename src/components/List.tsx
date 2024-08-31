@@ -1,7 +1,5 @@
-const checkIcon = <i className="fa-solid fa-circle-check iconsImported"></i>;
+const checkIcon = <i className="fa-solid fa-circle-check"></i>;
 const deleteIcon = <i className="fa-solid fa-trash-can"></i>;
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 
@@ -18,14 +16,6 @@ function List({
   removeTask: any;
   handlerCompleted: any;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   //refs
   const taskRef = useRef<HTMLLIElement>(null);
   const nameRef = useRef<HTMLParagraphElement>(null);
@@ -63,32 +53,21 @@ function List({
   }, [completed]);
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="bg-colorBg2 relative"
-    >
-      <li
-        ref={taskRef}
-        className="py-4 px-8 rounded-[5px] mb-4 md:mb-0 list-none border-[1px] border-colorIcons3 shadow-shadow3 hover:cursor-pointer scale-active"
-      >
+    <div className="bg-bgSecondary relative drop-shadow-md border-l-4 border-red-700 rounded-md">
+      <li ref={taskRef} className="py-4 px-4 hover:cursor-pointer scale-active">
         <p
           ref={nameRef}
-          className={`text-lg md:text-xl   ${
+          className={`text-base md:text-2xl   ${
             completed
-              ? "line-through text-colorPrimaryGreen"
-              : "no-underline text-colorGrey0"
+              ? "line-through text-black/40"
+              : "no-underline text-black/90"
           }`}
         >
           {name}
         </p>
-        <div className="absolute right-0 top-1/2 gap-2 fontImported buttons text-xl md:text-4xl py-2 px-4 flex items-center justify-center bg-transparent border-0 text-colorIcons2">
-          <button onDoubleClick={() => handlerCompleted(id)}>
-            {checkIcon}
-          </button>
-          <button onDoubleClick={animateAndRemoveFromDom}>{deleteIcon}</button>
+        <div className="absolute right-0 top-1/2 gap-4 buttons text-xl md:text-2xl py-2 px-4 flex items-center justify-center bg-transparent border-0 text-black/50">
+          <button onClick={() => handlerCompleted(id)}>{checkIcon}</button>
+          <button onClick={animateAndRemoveFromDom}>{deleteIcon}</button>
         </div>
       </li>
     </div>

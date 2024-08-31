@@ -3,31 +3,11 @@ import { Task } from "./interfaces/task";
 import List from "./components/List";
 import FormTask from "./components/FormTask";
 import uuid from "react-uuid";
-import { DndContext } from "@dnd-kit/core";
-import { SortableContext } from "@dnd-kit/sortable";
 import { gsap } from "gsap";
-
-const infoInitial = [
-  {
-    id: uuid(),
-    name: "Learn React",
-    completed: false,
-  },
-  {
-    id: uuid(),
-    name: "Learn Firebase",
-    completed: false,
-  },
-  {
-    id: uuid(),
-    name: "Learn Node",
-    completed: false,
-  },
-];
 
 function App() {
   //states
-  const [tasks, setTasks] = useState<Task[]>(infoInitial);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [value, setValue] = useState("");
 
   //refs
@@ -81,24 +61,17 @@ function App() {
     saveToLocalStorage(taskCompleted);
   };
 
-  const handleDragEnd = (event: any) => {
-    //active is the position of the current Li and over is where we want to put the Li
-    const { active, over } = event;
+  //tasks pending
+  const tasksPending = () => {
+    const pending = tasks.filter((task: Task) => !task.completed);
+    return pending.length;
+  };
 
-    //We validate that you do not want to put it in the same place
-    if (active.id !== over.id) {
-      //We look for the current and expected index in the Li arrangement
-      const overIndex = tasks.findIndex((task: Task) => task.id === over.id);
-      const activeIndex = tasks.findIndex(
-        (task: Task) => task.id === active.id
-      );
-
-      //We create a new arrangement with the tasks, delete the li in the current position and replace it in the desired position
-      const newTasks = [...tasks];
-      newTasks.splice(activeIndex, 1);
-      newTasks.splice(overIndex, 0, tasks[activeIndex]);
-      setTasks(newTasks);
-    }
+  //delete completed tasks
+  const deleteCompleted = () => {
+    const tasksPending = tasks.filter((task: Task) => !task.completed);
+    setTasks(tasksPending);
+    saveToLocalStorage(tasksPending);
   };
 
   //local storage
@@ -143,49 +116,53 @@ function App() {
   }, []);
 
   return (
-    <main className="min-h-screen py-20 px-60 bg-colorBg3 overflow-hidden">
+    <main className="min-h-screen md:py-10 md:px-36 px-10 py-5 bg-bgPrimary overflow-hidden">
       <FormTask
         handleSubmit={handleSubmit}
         value={value}
         handleChange={handleChange}
       />
-      <DndContext onDragEnd={handleDragEnd}>
-        <SortableContext items={tasks.map((task: Task) => task.id)}>
-          <ul
-            ref={taskCon}
-            className="overflow-hidden bg-colorBg2 p-20 rounded-2xl shadow-shadow3 border-[1px] border-colorIcons3"
-          >
-            <div className="flex justify-between items-center mb-8">
-              <p className="text-xl md:text-2xl text-colorGrey2 font-semibold">
-                Priority
+      <ul
+        ref={taskCon}
+        className="overflow-hidden bg-bgSecondary md:p-20 py-10 px-5 rounded-2xl shadow-lg border-[1px]"
+      >
+        <div
+          ref={taskRef}
+          className="grid grid-cols-1 gap-4 transition-all-300"
+        >
+          {tasks.length > 0 && (
+            <div className="flex md:justify-between mb-3 md:flex-row flex-col">
+              <p className="text-lg font-extrabold mb-2 md:mb-0">
+                You have {tasksPending().toString()} tasks pending. 🚀
               </p>
-              <p className="text-xl md:text-2xl text-colorDanger font-semibold">
-                High
+              <button
+                onClick={deleteCompleted}
+                className="py-2 md:px-2 px-1 text-sm text-white font-bold bg-red-600 rounded-md"
+              >
+                Delete completed tasks
+              </button>
+            </div>
+          )}
+          {tasks.length === 0 ? (
+            <div className="flex justify-center">
+              <p className="text-xs md:text-lg font-extrabold">
+                There are no tasks yet. Start by adding some. 🤔
               </p>
             </div>
-            <div
-              ref={taskRef}
-              className="grid grid-cols-1 gap-4 transition-all-300 md:grid-cols-2 mb-8"
-            >
-              {tasks.map((task: Task) => {
-                return (
-                  <List
-                    key={task.id}
-                    name={task.name}
-                    completed={task.completed}
-                    id={task.id}
-                    removeTask={removeTask}
-                    handlerCompleted={handlerCompleted}
-                  />
-                );
-              })}
-            </div>
-            <div className="mb-2 flex justify-end">
-              <p className="text-xl md:text-2xl font-semibold degrade">Low</p>
-            </div>
-          </ul>
-        </SortableContext>
-      </DndContext>
+          ) : (
+            tasks.map((task: Task) => (
+              <List
+                key={task.id}
+                name={task.name}
+                completed={task.completed}
+                id={task.id}
+                removeTask={removeTask}
+                handlerCompleted={handlerCompleted}
+              />
+            ))
+          )}
+        </div>
+      </ul>
     </main>
   );
 }
